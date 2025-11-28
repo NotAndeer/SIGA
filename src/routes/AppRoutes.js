@@ -12,6 +12,9 @@ import FinancialReport from '../pages/FinancialReport';
 import Login from '../pages/Login';
 import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
+import Register from '../pages/Register';
+import Register from '../pages/Register';
+
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -33,6 +36,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Rutas públicas */}
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       {/* Rutas protegidas */}
       <Route 
