@@ -1,7 +1,8 @@
 .app-header {
-  background-color: #2c3e50;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -14,24 +15,31 @@
   padding: 0 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  height: 70px;
+  height: 80px;
 }
 
 .logo-section .logo-link {
   text-decoration: none;
-  color: white;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo-section h1 {
   margin: 0;
-  font-size: 1.8rem;
-  font-weight: bold;
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo-section span {
-  font-size: 0.8rem;
-  opacity: 0.8;
-  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
 }
 
 .main-nav .nav-list {
@@ -39,50 +47,81 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 8px;
 }
 
 .nav-link {
-  color: white;
+  color: #495057;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 12px 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.nav-link:hover::before,
+.nav-link.active::before {
+  left: 0;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateY(-2px);
 }
 
 .user-section .login-btn {
-  background-color: #3498db;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 12px 24px;
+  border-radius: 25px;
   text-decoration: none;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .user-section .login-btn:hover {
-  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .header-container {
     padding: 0 1rem;
     flex-direction: column;
     height: auto;
     padding: 1rem;
-  }
-
-  .main-nav .nav-list {
     gap: 1rem;
-    margin: 1rem 0;
   }
-
+  
+  .main-nav .nav-list {
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .nav-link {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  
   .logo-section span {
-    display: block;
-    margin-left: 0;
+    display: none;
   }
 }
