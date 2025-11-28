@@ -1,0 +1,1 @@
+export default function FinancialReport(){return <div>Financial report placeholder</div>}

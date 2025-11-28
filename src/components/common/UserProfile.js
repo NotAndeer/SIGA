@@ -1,0 +1,1 @@
+import React from 'react'; export default function UserProfile(){const user=JSON.parse(localStorage.getItem('user')||'null'); return <div className='user-profile'>{user?.name||'Usuario'}</div>;} 
