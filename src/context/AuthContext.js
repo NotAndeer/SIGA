@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { authService } from '../services/authService';
+import { onAuthStateChanged } from 'firebase/auth';
+import { authService, authMapper } from '../services/authService';
+import { auth } from '../services/firebase';
 
 const AuthContext = createContext();
 
@@ -53,22 +55,25 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    // Verificar autenticación al cargar la aplicación
-    const checkAuth = async () => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        const userData = await authService.verifyToken();
-        if (userData) {
+        if (firebaseUser) {
+          const userData = await authMapper.buildUser(firebaseUser);
           dispatch({ type: 'LOGIN_SUCCESS', payload: { user: userData } });
+        } else {
+          dispatch({ type: 'LOGOUT' });
         }
       } catch (error) {
-        dispatch({ type: 'LOGOUT' });
+        console.error('Error al obtener el usuario de Firebase', error);
+        dispatch({ type: 'LOGIN_FAILURE', payload: 'No se pudo obtener la sesión' });
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
-    };
+    });
 
-    checkAuth();
+    return () => unsubscribe();
   }, []);
 
   const login = async (credentials) => {
@@ -78,21 +83,39 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
       return result;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Error de autenticación';
-      dispatch({ type: 'LOGIN_FAILURE', payload: errorMessage });
+      const firebaseMessage = error.code?.includes('auth/')
+        ? 'Credenciales inválidas o usuario no encontrado'
+        : 'Error de autenticación';
+      dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
       throw error;
     }
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await authService.logout();
     dispatch({ type: 'LOGOUT' });
+  };
+
+  const register = async (data) => {
+    try {
+      dispatch({ type: 'LOGIN_START' });
+      const result = await authService.register(data);
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
+      return result;
+    } catch (error) {
+      const firebaseMessage = error.code?.includes('auth/')
+        ? 'No se pudo crear la cuenta con los datos proporcionados'
+        : 'Error al crear la cuenta';
+      dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
+      throw error;
+    }
   };
 
   const value = {
     ...state,
     login,
-    logout
+    logout,
+    register
   };
 
   return (

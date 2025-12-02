@@ -1,49 +1,43 @@
-import api from './api';
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  getIdTokenResult,
+} from 'firebase/auth';
+import { auth } from './firebase';
+
+const buildUser = async (firebaseUser) => {
+  const tokenResult = await getIdTokenResult(firebaseUser);
+  return {
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    displayName: firebaseUser.displayName,
+    photoURL: firebaseUser.photoURL,
+    role: tokenResult.claims.role || 'miembro',
+    emailVerified: firebaseUser.emailVerified,
+  };
+};
 
 export const authService = {
-  // Login de usuario
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
+  login: async ({ email, password }) => {
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+    const parsedUser = await buildUser(user);
+    return { user: parsedUser };
+  },
 
-    if (response.data.token) {
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+  logout: async () => {
+    await signOut(auth);
+  },
+
+  register: async ({ name, email, password }) => {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+    if (name) {
+      await updateProfile(user, { displayName: name });
     }
-
-    return response.data;
+    const parsedUser = await buildUser(auth.currentUser || user);
+    return { user: parsedUser };
   },
-
-  // Logout
-  logout: () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-  },
-
-  // Verificar token
-  verifyToken: async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return null;
-
-    try {
-      const response = await api.get('/auth/verify');
-      return response.data;
-    } catch (error) {
-      // Token inválido - limpiar storage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      throw error;
-    }
-  },
-
-  // Registro de nuevo usuario
-  register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  },
-
-  // Cambiar contraseña
-  changePassword: async (passwordData) => {
-    const response = await api.post('/auth/change-password', passwordData);
-    return response.data;
-  }
 };
+
+export const authMapper = { buildUser };
