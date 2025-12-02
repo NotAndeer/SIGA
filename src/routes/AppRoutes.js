@@ -35,8 +35,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // Envolver children en un único elemento JSX para evitar el error de "adjacent JSX elements"
-  return <>{children}</>;
+  return children;
 };
 
 const AppRoutes = () => {
@@ -47,85 +46,85 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
 
       {/* Rutas protegidas */}
-      <Route
-        path="/"
+      <Route 
+        path="/" 
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/members"
+      <Route 
+        path="/members" 
         element={
           <ProtectedRoute>
             <MemberList />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/members/new"
+      <Route 
+        path="/members/new" 
         element={
           <ProtectedRoute requiredRole="admin">
             <MemberForm />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/members/edit/:id"
+      <Route 
+        path="/members/edit/:id" 
         element={
           <ProtectedRoute requiredRole="admin">
             <MemberForm />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/events"
+      <Route 
+        path="/events" 
         element={
           <ProtectedRoute>
             <EventList />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/events/new"
+      <Route 
+        path="/events/new" 
         element={
           <ProtectedRoute requiredRole="admin">
             <EventForm />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/events/edit/:id"
+      <Route 
+        path="/events/edit/:id" 
         element={
           <ProtectedRoute requiredRole="admin">
             <EventForm />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/financial"
+      <Route 
+        path="/financial" 
         element={
           <ProtectedRoute requiredRole="treasurer">
             <FinancialReport />
           </ProtectedRoute>
-        }
+        } 
       />
 
-      <Route
-        path="/profile"
+      <Route 
+        path="/profile" 
         element={
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
-        }
+        } 
       />
 
       {/* Rutas especiales */}
