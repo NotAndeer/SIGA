@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEvent } from '../../context/EventContext';
+import { EventItem } from '../../types/models';
 import './EventForm.css';
 
-const emptyEvent = {
+type EventFormData = {
+  title: string;
+  date: string;
+  location: string;
+  description: string;
+  capacity: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  category: string;
+};
+
+type FormErrors = Partial<Record<keyof EventFormData | 'submit', string>>;
+
+const emptyEvent: EventFormData = {
   title: '',
   date: new Date().toISOString().split('T')[0],
   location: '',
@@ -19,8 +32,8 @@ const EventForm = () => {
   const isEditing = Boolean(id);
   const { getEventById, createEvent, updateEvent, currentEvent } = useEvent();
 
-  const [formData, setFormData] = useState(emptyEvent);
-  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState<EventFormData>(emptyEvent);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,7 +58,7 @@ const EventForm = () => {
         date: currentEvent.date ? currentEvent.date.split('T')[0] : new Date().toISOString().split('T')[0],
         location: currentEvent.location || '',
         description: currentEvent.description || '',
-        capacity: currentEvent.capacity || '',
+        capacity: currentEvent.capacity ? String(currentEvent.capacity) : '',
         status: currentEvent.status || 'scheduled',
         category: currentEvent.category || 'general'
       });
@@ -53,16 +66,19 @@ const EventForm = () => {
   }, [currentEvent, isEditing]);
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
     if (!formData.title.trim()) newErrors.title = 'El título es obligatorio';
     if (!formData.date) newErrors.date = 'La fecha es obligatoria';
     return newErrors;
   };
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
+    const fieldName = name as keyof FormErrors;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
+    if (errors[fieldName]) setErrors((prev) => ({ ...prev, [fieldName]: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -75,10 +91,15 @@ const EventForm = () => {
 
     try {
       setLoading(true);
+      const payload: Partial<EventItem> = {
+        ...formData,
+        capacity: formData.capacity ? Number(formData.capacity) : undefined
+      };
+
       if (isEditing) {
-        await updateEvent(id, formData);
+        await updateEvent(id, payload);
       } else {
-        await createEvent(formData);
+        await createEvent(payload);
       }
       navigate('/events');
     } catch (error) {
