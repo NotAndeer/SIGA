@@ -1,17 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { transactionService } from '../services/transactionService';
 import './FinancialReport.css';
 
-const seedTransactions = [
-  { id: 't1', type: 'income', category: 'Cuotas', description: 'Pago mensual', amount: 150000, date: '2024-05-02', status: 'cleared' },
-  { id: 't2', type: 'expense', category: 'Logística', description: 'Alquiler de salón', amount: 80000, date: '2024-05-10', status: 'pending' },
-  { id: 't3', type: 'income', category: 'Donaciones', description: 'Aporte voluntario', amount: 200000, date: '2024-04-28', status: 'cleared' },
-];
-
 const FinancialReport = () => {
-  const [transactions, setTransactions] = useState(seedTransactions);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ type: 'all', status: 'all', month: 'all' });
   const [formData, setFormData] = useState({ type: 'income', category: '', amount: '', date: '', description: '' });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await transactionService.getAll();
+        setTransactions(response.data || []);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -36,7 +43,7 @@ const FinancialReport = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validation = validate();
     if (Object.keys(validation).length) {
@@ -46,22 +53,27 @@ const FinancialReport = () => {
 
     const newTx = {
       ...formData,
-      id: crypto.randomUUID(),
       amount: Number(formData.amount),
       status: 'pending'
     };
-    setTransactions((prev) => [newTx, ...prev]);
+
+    const saved = await transactionService.create(newTx);
+    setTransactions((prev) => [saved.data, ...prev]);
     setFormData({ type: 'income', category: '', amount: '', date: '', description: '' });
     setErrors({});
   };
 
-  const toggleStatus = (id) => {
-    setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, status: tx.status === 'cleared' ? 'pending' : 'cleared' } : tx)));
+  const toggleStatus = async (id) => {
+    const target = transactions.find((tx) => tx.id === id);
+    const nextStatus = target?.status === 'cleared' ? 'pending' : 'cleared';
+    await transactionService.update(id, { status: nextStatus });
+    setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, status: nextStatus } : tx)));
   };
 
-  const deleteTx = (id) => {
+  const deleteTx = async (id) => {
     const confirmed = window.confirm('¿Eliminar este movimiento?');
     if (!confirmed) return;
+    await transactionService.delete(id);
     setTransactions((prev) => prev.filter((tx) => tx.id !== id));
   };
 
@@ -170,6 +182,7 @@ const FinancialReport = () => {
           </div>
 
           <div className="transaction-list">
+            {loading && <div className="empty">Cargando movimientos guardados…</div>}
             {filteredTransactions.length === 0 && <div className="empty">No hay movimientos con los filtros seleccionados.</div>}
             {filteredTransactions.map((tx) => (
               <div key={tx.id} className="transaction-item">
