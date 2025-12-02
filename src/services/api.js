@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { signOut } from 'firebase/auth';
+import { auth } from './firebase';
 
 // Configuración base de Axios
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
@@ -13,9 +15,10 @@ const api = axios.create({
 
 // Interceptor para añadir token de autenticación
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
+  async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -33,8 +36,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expirado o inválido - redirigir a login
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+      signOut(auth);
       window.location.href = '/login';
     }
     return Promise.reject(error);
