@@ -15,6 +15,7 @@ SIGA es una aplicación web desarrollada en React.js para la gestión integral d
 - React 18.2.0
 - React Router DOM 6.8.0
 - Axios 1.3.0
+- Firebase Auth 10.x
 - Context API + Hooks
 - CSS3
 
@@ -31,9 +32,19 @@ cd siga-frontend
 npm install
 ```
 
-3. Configurar variables de entorno:
+3. Configurar variables de entorno (Firebase + API REST):
 ```bash
 cp .env.example .env
+
+# Variables esperadas
+REACT_APP_FIREBASE_API_KEY=AIzaSyA4LU4hYcwxPKzW22eLBZ5Qrm83NqR3d-4
+REACT_APP_FIREBASE_AUTH_DOMAIN=siga-8d770.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=siga-8d770
+REACT_APP_FIREBASE_STORAGE_BUCKET=siga-8d770.firebasestorage.app
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=737541935480
+REACT_APP_FIREBASE_APP_ID=1:737541935480:web:cc686ca11108274ae2b88d
+REACT_APP_FIREBASE_MEASUREMENT_ID=G-HTHRV0SH65
+REACT_APP_API_URL=https://tu-backend/api
 ```
 
 4. Ejecutar en desarrollo:

@@ -1,1 +1,25 @@
-import React from 'react'; export default function UserProfile(){const user=JSON.parse(localStorage.getItem('user')||'null'); return <div className='user-profile'>{user?.name||'Usuario'}</div>;} 
+import React from 'react';
+import { useAuth } from '../../context/AuthContext';
+import './UserProfile.css';
+
+const UserProfile = () => {
+  const { user, logout } = useAuth();
+  const initials = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
+
+  return (
+    <div className="user-profile">
+      <div className="avatar" aria-hidden>
+        {initials}
+      </div>
+      <div className="user-meta">
+        <span className="user-name">{user?.displayName || 'Usuario'}</span>
+        <span className="user-email">{user?.email}</span>
+      </div>
+      <button className="logout" onClick={logout}>
+        Salir
+      </button>
+    </div>
+  );
+};
+
+export default UserProfile;

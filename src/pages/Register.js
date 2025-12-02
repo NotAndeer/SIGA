@@ -1,7 +1,7 @@
 // src/pages/Register.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Register.css';
 
 const Register = () => {
@@ -14,6 +14,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,18 +43,15 @@ const Register = () => {
 
     try {
       setLoading(true);
-      // Llamada al servicio de registro (ya existe en authService.js)
-      await authService.register({
+      await register({
         name: form.name,
         email: form.email,
-        password: form.password
+        password: form.password,
       });
 
-      // Redirigir al login con query param opcional para mostrar mensaje
-      navigate('/login', { state: { registered: true } });
+      navigate('/', { replace: true });
     } catch (error) {
-      // Mostrar error genérico o el mensaje que venga del backend
-      const message = error.response?.data?.message || 'Error al registrar el usuario';
+      const message = error.message || 'Error al registrar el usuario';
       setErrors({ submit: message });
       console.error('Register error:', error);
     } finally {
@@ -66,7 +64,7 @@ const Register = () => {
       <div className="register-form">
         <div className="register-header">
           <h1>Crear Cuenta</h1>
-          <p>Regístrate para acceder al sistema</p>
+          <p>Regístrate para acceder al sistema con tu cuenta segura</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -136,13 +134,10 @@ const Register = () => {
               {loading ? 'Registrando...' : 'Crear cuenta'}
             </button>
 
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={() => navigate('/login')}
-            >
-              Volver a Iniciar Sesión
-            </button>
+            <p className="helper-text">
+              ¿Ya tienes una cuenta?{' '}
+              <Link to="/login" className="link-inline">Inicia sesión</Link>
+            </p>
           </div>
         </form>
       </div>
