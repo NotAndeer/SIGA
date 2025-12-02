@@ -1,0 +1,83 @@
+.event-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-calendar-item {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.event-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.event-day {
+  font-size: 1.05rem;
+}
+
+.event-status {
+  width: fit-content;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.event-status.scheduled {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.event-status.completed {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.event-status.cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.event-details h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.event-location {
+  margin: 0.2rem 0 0;
+  color: #334155;
+  font-weight: 600;
+}
+
+.event-description {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+}
+
+.empty-calendar {
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  text-align: center;
+  color: #475569;
+}
+
+@media (max-width: 768px) {
+  .event-calendar-item {
+    grid-template-columns: 1fr;
+  }
+}

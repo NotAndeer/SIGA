@@ -18,10 +18,31 @@ const Dashboard = () => {
 
   const stats = {
     totalMembers: members.length,
-    activeMembers: members.filter(m => m.status === 'active').length,
-    pendingPayments: members.filter(m => m.paymentStatus === 'pending').length,
+    activeMembers: members.filter(m => (m.status || 'active') === 'active').length,
+    pendingPayments: members.filter(m => (m.paymentStatus || '').toLowerCase() === 'pending').length,
     upcomingEvents: events.filter(e => new Date(e.date) > new Date()).length
   };
+
+  const activityItems = [...members
+    .filter((m) => m.joinDate)
+    .map((m) => ({
+      id: `member-${m.id || m._id}`,
+      title: `Nuevo miembro: ${m.name}`,
+      description: m.profession,
+      meta: m.email,
+      date: m.joinDate,
+      type: 'success'
+    })),
+    ...events.map((e) => ({
+      id: `event-${e.id || e._id}`,
+      title: `Evento: ${e.title}`,
+      description: e.location,
+      meta: e.status,
+      date: e.date || e.createdAt || new Date().toISOString(),
+      type: e.status === 'cancelled' ? 'danger' : 'info'
+    }))]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 6);
 
   return (
     <div className="dashboard">
@@ -42,7 +63,7 @@ const Dashboard = () => {
 
         <div className="dashboard-section">
           <h2>Actividad Reciente</h2>
-          <RecentActivity />
+          <RecentActivity items={activityItems} />
         </div>
       </div>
     </div>

@@ -1,0 +1,82 @@
+.event-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.event-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.event-date-text {
+  margin: 0.2rem 0;
+  color: #475569;
+}
+
+.event-location {
+  margin: 0.2rem 0;
+  font-weight: 600;
+  color: #0ea5e9;
+}
+
+.event-description {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+}
+
+.event-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.event-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge.scheduled {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.badge.completed {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.badge.cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.btn-light,
+.btn-danger {
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-light {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+}
+
+.btn-danger {
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}

@@ -1,1 +1,1 @@
-export default function EventForm(){return <div>Event form placeholder</div>}
+export { default } from '../components/events/EventForm';

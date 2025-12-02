@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { memberService } from '../services/memberService';
 
 const MemberContext = createContext();
@@ -64,7 +64,7 @@ const initialState = {
 export const MemberProvider = ({ children }) => {
   const [state, dispatch] = useReducer(memberReducer, initialState);
 
-  const loadMembers = async () => {
+  const loadMembers = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await memberService.getAll();
@@ -75,7 +75,7 @@ export const MemberProvider = ({ children }) => {
         payload: 'Error al cargar miembros: ' + error.message 
       });
     }
-  };
+  }, []);
 
   const addMember = async (memberData) => {
     try {
