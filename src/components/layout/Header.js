@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import UserProfile from '../common/UserProfile';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
@@ -16,6 +16,11 @@ const Header = () => {
     <header className="app-header">
       <div className="header-container">
         <div className="logo-section">
+          {isAuthenticated && (
+            <button className="menu-toggle" onClick={onToggleSidebar} aria-label="Abrir menú">
+              ☰
+            </button>
+          )}
           <Link to="/" className="logo-link">
             <h1>SIGA</h1>
             <span>Sistema Integrado de Gestión para Asociaciones</span>

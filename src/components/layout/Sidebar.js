@@ -2,15 +2,18 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   return (
-    <aside className="app-sidebar">
+    <aside className={`app-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-brand">
         <span className="brand-dot" />
         <div>
           <p className="brand-title">SIGA</p>
           <p className="brand-subtitle">Panel administrativo</p>
         </div>
+        <button className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">
+          ✕
+        </button>
       </div>
 
       <nav className="sidebar-nav">
