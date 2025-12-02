@@ -12,6 +12,7 @@ SIGA es una aplicación web desarrollada en React.js para la gestión integral d
 - ✅ API REST integrada
 
 ## Tecnologías
+- TypeScript 5
 - React 18.2.0
 - React Router DOM 6.8.0
 - Axios 1.3.0

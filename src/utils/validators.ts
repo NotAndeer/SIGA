@@ -1,28 +1,28 @@
 // Validadores reutilizables para formularios
 
-export const validateEmail = (email) => {
+export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
-export const validatePhone = (phone) => {
+export const validatePhone = (phone: string): boolean => {
   const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
   return phoneRegex.test(phone.replace(/\s/g, ''));
 };
 
-export const validateRequired = (value) => {
-  return value && value.trim().length > 0;
+export const validateRequired = (value: string | undefined | null): boolean => {
+  return !!value && value.trim().length > 0;
 };
 
-export const validateMinLength = (value, minLength) => {
-  return value && value.length >= minLength;
+export const validateMinLength = (value: string, minLength: number): boolean => {
+  return !!value && value.length >= minLength;
 };
 
-export const validateMaxLength = (value, maxLength) => {
-  return value && value.length <= maxLength;
+export const validateMaxLength = (value: string, maxLength: number): boolean => {
+  return !!value && value.length <= maxLength;
 };
 
-export const validatePassword = (password) => {
+export const validatePassword = (password: string) => {
   const minLength = 8;
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
@@ -42,8 +42,8 @@ export const validatePassword = (password) => {
 };
 
 // Validador para formulario de miembros
-export const validateMemberForm = (formData) => {
-  const errors = {};
+export const validateMemberForm = (formData: Record<string, string>) => {
+  const errors: Record<string, string> = {};
 
   if (!validateRequired(formData.name)) {
     errors.name = 'El nombre es obligatorio';

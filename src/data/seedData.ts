@@ -1,4 +1,6 @@
-export const seedMembers = [
+import { EventItem, Member, TransactionItem } from '../types/models';
+
+export const seedMembers: Member[] = [
   {
     id: 'm1',
     name: 'María López',
@@ -25,7 +27,7 @@ export const seedMembers = [
   }
 ];
 
-export const seedEvents = [
+export const seedEvents: EventItem[] = [
   {
     id: 'e1',
     title: 'Asamblea General',
@@ -48,7 +50,7 @@ export const seedEvents = [
   }
 ];
 
-export const seedTransactions = [
+export const seedTransactions: TransactionItem[] = [
   { id: 't1', type: 'income', category: 'Cuotas', description: 'Pago mensual', amount: 150000, date: '2024-05-02', status: 'cleared' },
   { id: 't2', type: 'expense', category: 'Logística', description: 'Alquiler de salón', amount: 80000, date: '2024-05-10', status: 'pending' },
   { id: 't3', type: 'income', category: 'Donaciones', description: 'Aporte voluntario', amount: 200000, date: '2024-04-28', status: 'cleared' }

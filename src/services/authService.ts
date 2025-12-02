@@ -6,8 +6,9 @@ import {
   getIdTokenResult,
 } from 'firebase/auth';
 import { auth } from './firebase';
+import { AuthUser } from '../types/models';
 
-const buildUser = async (firebaseUser) => {
+const buildUser = async (firebaseUser: any): Promise<AuthUser & { emailVerified?: boolean }> => {
   const tokenResult = await getIdTokenResult(firebaseUser);
   return {
     uid: firebaseUser.uid,
@@ -22,7 +23,7 @@ const buildUser = async (firebaseUser) => {
 };
 
 export const authService = {
-  login: async ({ email, password }) => {
+  login: async ({ email, password }: { email: string; password: string }): Promise<{ user: AuthUser }> => {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
     const parsedUser = await buildUser(user);
     return { user: parsedUser };
@@ -32,7 +33,7 @@ export const authService = {
     await signOut(auth);
   },
 
-  register: async ({ name, email, password }) => {
+  register: async ({ name, email, password }: { name?: string; email: string; password: string }): Promise<{ user: AuthUser }> => {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     if (name) {
       await updateProfile(user, { displayName: name });

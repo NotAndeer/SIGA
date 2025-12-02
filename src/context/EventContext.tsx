@@ -1,9 +1,34 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { eventService } from '../services/eventService';
+import { EventItem } from '../types/models';
 
-const EventContext = createContext();
+type EventState = {
+  events: EventItem[];
+  loading: boolean;
+  error: string | null;
+  currentEvent: EventItem | null;
+};
 
-const eventReducer = (state, action) => {
+type EventAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_EVENTS'; payload: EventItem[] }
+  | { type: 'ADD_EVENT'; payload: EventItem }
+  | { type: 'UPDATE_EVENT'; payload: EventItem }
+  | { type: 'DELETE_EVENT'; payload: string }
+  | { type: 'SET_CURRENT_EVENT'; payload: EventItem | null }
+  | { type: 'SET_ERROR'; payload: string };
+
+type EventContextValue = EventState & {
+  loadEvents: () => Promise<void>;
+  getEventById: (id: string) => Promise<EventItem | undefined>;
+  createEvent: (data: Partial<EventItem>) => Promise<EventItem>;
+  updateEvent: (id: string, data: Partial<EventItem>) => Promise<EventItem | undefined>;
+  deleteEvent: (id: string) => Promise<void>;
+};
+
+const EventContext = createContext<EventContextValue | undefined>(undefined);
+
+const eventReducer = (state: EventState, action: EventAction): EventState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
@@ -32,17 +57,19 @@ const eventReducer = (state, action) => {
   }
 };
 
-const initialState = {
+const initialState: EventState = {
   events: [],
   loading: false,
   error: null,
   currentEvent: null,
 };
 
-export const EventProvider = ({ children }) => {
+type Props = { children: React.ReactNode };
+
+export const EventProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(eventReducer, initialState);
 
-  const loadEvents = useCallback(async () => {
+  const loadEvents = useCallback(async (): Promise<void> => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await eventService.getAll();
@@ -52,7 +79,7 @@ export const EventProvider = ({ children }) => {
     }
   }, []);
 
-  const getEventById = useCallback(async (id) => {
+  const getEventById = useCallback(async (id: string) => {
     try {
       const response = await eventService.getById(id);
       dispatch({ type: 'SET_CURRENT_EVENT', payload: response.data });
@@ -63,7 +90,7 @@ export const EventProvider = ({ children }) => {
     }
   }, []);
 
-  const createEvent = useCallback(async (data) => {
+  const createEvent = useCallback(async (data: Partial<EventItem>) => {
     try {
       const response = await eventService.create(data);
       dispatch({ type: 'ADD_EVENT', payload: response.data });
@@ -74,7 +101,7 @@ export const EventProvider = ({ children }) => {
     }
   }, []);
 
-  const updateEvent = useCallback(async (id, data) => {
+  const updateEvent = useCallback(async (id: string, data: Partial<EventItem>) => {
     try {
       const response = await eventService.update(id, data);
       dispatch({ type: 'UPDATE_EVENT', payload: response.data });
@@ -85,7 +112,7 @@ export const EventProvider = ({ children }) => {
     }
   }, []);
 
-  const deleteEvent = useCallback(async (id) => {
+  const deleteEvent = useCallback(async (id: string) => {
     try {
       await eventService.delete(id);
       dispatch({ type: 'DELETE_EVENT', payload: id });
@@ -107,7 +134,7 @@ export const EventProvider = ({ children }) => {
   return <EventContext.Provider value={value}>{children}</EventContext.Provider>;
 };
 
-export const useEvent = () => {
+export const useEvent = (): EventContextValue => {
   const context = useContext(EventContext);
   if (!context) {
     throw new Error('useEvent debe ser usado dentro de EventProvider');

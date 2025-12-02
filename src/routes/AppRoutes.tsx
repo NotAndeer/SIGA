@@ -15,8 +15,13 @@ import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
 import LoadingScreen from '../components/common/LoadingScreen';
 
+type ProtectedRouteProps = {
+  children: React.ReactElement;
+  requiredRole?: string | null;
+};
+
 // Componente para rutas protegidas
-const ProtectedRoute = ({ children, requiredRole = null }) => {
+const ProtectedRoute = ({ children, requiredRole = null }: ProtectedRouteProps) => {
   const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {

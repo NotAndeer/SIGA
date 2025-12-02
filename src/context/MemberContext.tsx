@@ -1,9 +1,34 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { memberService } from '../services/memberService';
+import { Member } from '../types/models';
 
-const MemberContext = createContext();
+type MemberState = {
+  members: Member[];
+  loading: boolean;
+  error: string | null;
+  currentMember: Member | null;
+};
 
-const memberReducer = (state, action) => {
+type MemberAction =
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_MEMBERS'; payload: Member[] }
+  | { type: 'ADD_MEMBER'; payload: Member }
+  | { type: 'UPDATE_MEMBER'; payload: Member }
+  | { type: 'DELETE_MEMBER'; payload: string }
+  | { type: 'SET_ERROR'; payload: string }
+  | { type: 'SET_CURRENT_MEMBER'; payload: Member | null };
+
+type MemberContextValue = MemberState & {
+  loadMembers: () => Promise<void>;
+  addMember: (member: Partial<Member>) => Promise<Member>;
+  updateMember: (id: string, member: Partial<Member>) => Promise<Member | undefined>;
+  deleteMember: (id: string) => Promise<void>;
+  getMemberById: (id: string) => Promise<Member | undefined>;
+};
+
+const MemberContext = createContext<MemberContextValue | undefined>(undefined);
+
+const memberReducer = (state: MemberState, action: MemberAction): MemberState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
@@ -54,17 +79,19 @@ const memberReducer = (state, action) => {
   }
 };
 
-const initialState = {
+const initialState: MemberState = {
   members: [],
   loading: false,
   error: null,
   currentMember: null
 };
 
-export const MemberProvider = ({ children }) => {
+type Props = { children: React.ReactNode };
+
+export const MemberProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(memberReducer, initialState);
 
-  const loadMembers = useCallback(async () => {
+  const loadMembers = useCallback(async (): Promise<void> => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await memberService.getAll();
@@ -77,7 +104,7 @@ export const MemberProvider = ({ children }) => {
     }
   }, []);
 
-  const addMember = async (memberData) => {
+  const addMember = async (memberData: Partial<Member>) => {
     try {
       const response = await memberService.create(memberData);
       dispatch({ type: 'ADD_MEMBER', payload: response.data });
@@ -91,7 +118,7 @@ export const MemberProvider = ({ children }) => {
     }
   };
 
-  const updateMember = async (id, memberData) => {
+  const updateMember = async (id: string, memberData: Partial<Member>) => {
     try {
       const response = await memberService.update(id, memberData);
       dispatch({ type: 'UPDATE_MEMBER', payload: response.data });
@@ -105,7 +132,7 @@ export const MemberProvider = ({ children }) => {
     }
   };
 
-  const deleteMember = async (id) => {
+  const deleteMember = async (id: string) => {
     try {
       await memberService.delete(id);
       dispatch({ type: 'DELETE_MEMBER', payload: id });
@@ -118,7 +145,7 @@ export const MemberProvider = ({ children }) => {
     }
   };
 
-  const getMemberById = async (id) => {
+  const getMemberById = async (id: string) => {
     try {
       const response = await memberService.getById(id);
       dispatch({ type: 'SET_CURRENT_MEMBER', payload: response.data });
@@ -148,7 +175,7 @@ export const MemberProvider = ({ children }) => {
   );
 };
 
-export const useMember = () => {
+export const useMember = (): MemberContextValue => {
   const context = useContext(MemberContext);
   if (!context) {
     throw new Error('useMember debe ser usado dentro de MemberProvider');

@@ -2,10 +2,34 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { authService, authMapper } from '../services/authService';
 import { auth } from '../services/firebase';
+import { AuthUser } from '../types/models';
 
-const AuthContext = createContext();
+type AuthState = {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  loading: boolean;
+  error: string | null;
+};
 
-const authReducer = (state, action) => {
+type AuthAction =
+  | { type: 'LOGIN_START' }
+  | { type: 'LOGIN_SUCCESS'; payload: { user: AuthUser } }
+  | { type: 'LOGIN_FAILURE'; payload: string }
+  | { type: 'LOGOUT' }
+  | { type: 'SET_LOADING'; payload: boolean };
+
+type Credentials = { email: string; password: string };
+type RegisterPayload = { name?: string; email: string; password: string };
+
+type AuthContextValue = AuthState & {
+  login: (credentials: Credentials) => Promise<{ user: AuthUser }>;
+  logout: () => Promise<void>;
+  register: (data: RegisterPayload) => Promise<{ user: AuthUser }>;
+};
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
     case 'LOGIN_START':
       return { ...state, loading: true, error: null };
@@ -44,14 +68,16 @@ const authReducer = (state, action) => {
   }
 };
 
-const initialState = {
+const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
   loading: false,
   error: null
 };
 
-export const AuthProvider = ({ children }) => {
+type Props = { children: React.ReactNode };
+
+export const AuthProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
@@ -76,7 +102,7 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  const login = async (credentials) => {
+  const login = async (credentials: Credentials) => {
     try {
       dispatch({ type: 'LOGIN_START' });
       const result = await authService.login(credentials);
@@ -96,7 +122,7 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGOUT' });
   };
 
-  const register = async (data) => {
+  const register = async (data: RegisterPayload) => {
     try {
       dispatch({ type: 'LOGIN_START' });
       const result = await authService.register(data);
@@ -125,7 +151,7 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth debe ser usado dentro de AuthProvider');
