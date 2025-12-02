@@ -8,7 +8,9 @@ const Header = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  const isActiveRoute = (path) => location.pathname === path;
+  const isActiveRoute = (path) => {
+    return location.pathname === path;
+  };
 
   return (
     <header className="app-header">
@@ -24,32 +26,32 @@ const Header = () => {
           <nav className="main-nav">
             <ul className="nav-list">
               <li className="nav-item">
-                <Link
-                  to="/"
+                <Link 
+                  to="/" 
                   className={`nav-link ${isActiveRoute('/') ? 'active' : ''}`}
                 >
                   Dashboard
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  to="/members"
+                <Link 
+                  to="/members" 
                   className={`nav-link ${isActiveRoute('/members') ? 'active' : ''}`}
                 >
                   Miembros
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  to="/events"
+                <Link 
+                  to="/events" 
                   className={`nav-link ${isActiveRoute('/events') ? 'active' : ''}`}
                 >
                   Eventos
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  to="/financial"
+                <Link 
+                  to="/financial" 
                   className={`nav-link ${isActiveRoute('/financial') ? 'active' : ''}`}
                 >
                   Finanzas
@@ -63,20 +65,9 @@ const Header = () => {
           {isAuthenticated ? (
             <UserProfile />
           ) : (
-            <div className="auth-links">
-              <Link
-                to="/login"
-                className={`login-btn ${isActiveRoute('/login') ? 'active' : ''}`}
-              >
-                Iniciar Sesión
-              </Link>
-              <Link
-                to="/register"
-                className={`register-btn ${isActiveRoute('/register') ? 'active' : ''}`}
-              >
-                Registrarse
-              </Link>
-            </div>
+            <Link to="/login" className="login-btn">
+              Iniciar Sesión
+            </Link>
           )}
         </div>
       </div>

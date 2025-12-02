@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Sistema Integrado de Gestión para Asociaciones - Frontend",
   "private": true,
+  "homepage": "https://tudominio.com/siga",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

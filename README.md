@@ -4,12 +4,12 @@
 SIGA es una aplicación web desarrollada en React.js para la gestión integral de asociaciones, incluyendo módulos para miembros, eventos y finanzas.
 
 ## Características
--  Gestión de miembros
--  Gestión de eventos
--  Gestión financiera
--  Autenticación y autorización
--  Interfaz responsive
--  API REST integrada
+- ✅ Gestión de miembros
+- ✅ Gestión de eventos
+- ✅ Gestión financiera
+- ✅ Autenticación y autorización
+- ✅ Interfaz responsive
+- ✅ API REST integrada
 
 ## Tecnologías
 - React 18.2.0
