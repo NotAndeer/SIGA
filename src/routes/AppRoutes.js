@@ -10,18 +10,24 @@ import EventList from '../pages/EventList';
 import EventForm from '../pages/EventForm';
 import FinancialReport from '../pages/FinancialReport';
 import Login from '../pages/Login';
+import Register from '../pages/Register';
 import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 // Componente para rutas protegidas
 const ProtectedRoute = ({ children, requiredRole = null }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen message="Verificando acceso..." />;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -33,6 +39,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Rutas públicas */}
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       {/* Rutas protegidas */}
       <Route 

@@ -1,0 +1,57 @@
+.member-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12);
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 600;
+}
+
+.stat-description {
+  margin: 0.2rem 0 0;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.stat-card.primary {
+  border-left: 4px solid #2563eb;
+}
+
+.stat-card.success {
+  border-left: 4px solid #16a34a;
+}
+
+.stat-card.warning {
+  border-left: 4px solid #f97316;
+}
+
+.stat-card.info {
+  border-left: 4px solid #0ea5e9;
+}
