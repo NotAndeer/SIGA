@@ -1,155 +1,150 @@
+// src/pages/Register.js
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
+import './Register.css';
 
 const Register = () => {
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    passwordConfirm: ''
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const validate = () => {
+    const err = {};
+    if (!form.name.trim()) err.name = 'El nombre es obligatorio';
+    if (!form.email.trim()) err.email = 'El email es obligatorio';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) err.email = 'Formato de email inválido';
+    if (!form.password) err.password = 'La contraseña es obligatoria';
+    if (form.password && form.password.length < 8) err.password = 'La contraseña debe tener al menos 8 caracteres';
+    if (form.password !== form.passwordConfirm) err.passwordConfirm = 'Las contraseñas no coinciden';
+    return err;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+    const validation = validate();
+    if (Object.keys(validation).length) {
+      setErrors(validation);
       return;
     }
-    
-    if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-    
-    setLoading(true);
-    
+
     try {
-      // Simular registro
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirigir al login después del registro
-      navigate('/login', { 
-        state: { message: 'Registro exitoso. Ahora puedes iniciar sesión.' } 
+      setLoading(true);
+      // Llamada al servicio de registro (ya existe en authService.js)
+      await authService.register({
+        name: form.name,
+        email: form.email,
+        password: form.password
       });
-    } catch (err) {
-      setError('Error en el registro. Intenta nuevamente.');
+
+      // Redirigir al login con query param opcional para mostrar mensaje
+      navigate('/login', { state: { registered: true } });
+    } catch (error) {
+      // Mostrar error genérico o el mensaje que venga del backend
+      const message = error.response?.data?.message || 'Error al registrar el usuario';
+      setErrors({ submit: message });
+      console.error('Register error:', error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
+    <div className="register-container">
+      <div className="register-form">
+        <div className="register-header">
           <h1>Crear Cuenta</h1>
-          <p>Regístrate para empezar a usar SIGA</p>
+          <p>Regístrate para acceder al sistema</p>
         </div>
 
-        {error && (
-          <div style={{
-            background: '#ffebee',
-            color: '#c62828',
-            padding: '12px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <span>⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Nombre Completo</label>
+            <label htmlFor="name">Nombre completo</label>
             <input
-              type="text"
               id="name"
               name="name"
-              value={formData.name}
+              value={form.name}
               onChange={handleChange}
-              placeholder="Juan Pérez"
-              required
-              disabled={loading}
+              className={errors.name ? 'error' : ''}
+              placeholder="Tu nombre completo"
             />
+            {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
 
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
-              type="email"
               id="email"
               name="email"
-              value={formData.email}
+              type="email"
+              value={form.email}
               onChange={handleChange}
+              className={errors.email ? 'error' : ''}
               placeholder="usuario@ejemplo.com"
-              required
-              disabled={loading}
             />
+            {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
             <input
-              type="password"
               id="password"
               name="password"
-              value={formData.password}
+              type="password"
+              value={form.password}
               onChange={handleChange}
-              placeholder="••••••••"
-              required
-              disabled={loading}
+              className={errors.password ? 'error' : ''}
+              placeholder="Mínimo 8 caracteres"
             />
+            {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+            <label htmlFor="passwordConfirm">Confirmar contraseña</label>
             <input
+              id="passwordConfirm"
+              name="passwordConfirm"
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              value={form.passwordConfirm}
               onChange={handleChange}
-              placeholder="••••••••"
-              required
-              disabled={loading}
+              className={errors.passwordConfirm ? 'error' : ''}
+              placeholder="Repite la contraseña"
             />
+            {errors.passwordConfirm && <span className="error-message">{errors.passwordConfirm}</span>}
           </div>
 
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={loading}
-          >
-            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
-          </button>
-        </form>
+          {errors.submit && <div className="form-error">{errors.submit}</div>}
 
-        <div className="auth-footer">
-          <p>
-            ¿Ya tienes cuenta?{' '}
-            <Link to="/login" className="auth-link">
-              Inicia sesión aquí
-            </Link>
-          </p>
-        </div>
+          <div className="form-actions">
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Registrando...' : 'Crear cuenta'}
+            </button>
+
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => navigate('/login')}
+            >
+              Volver a Iniciar Sesión
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
