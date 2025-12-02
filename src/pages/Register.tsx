@@ -4,26 +4,29 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Register.css';
 
+type RegisterForm = { name: string; email: string; password: string; passwordConfirm: string };
+type RegisterErrors = Partial<Record<keyof RegisterForm | 'submit', string>>;
+
 const Register = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<RegisterForm>({
     name: '',
     email: '',
     password: '',
     passwordConfirm: ''
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<RegisterErrors>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name as keyof RegisterForm]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const validate = () => {
-    const err = {};
+    const err: RegisterErrors = {};
     if (!form.name.trim()) err.name = 'El nombre es obligatorio';
     if (!form.email.trim()) err.email = 'El email es obligatorio';
     else if (!/\S+@\S+\.\S+/.test(form.email)) err.email = 'Formato de email inválido';
@@ -33,7 +36,7 @@ const Register = () => {
     return err;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = validate();
     if (Object.keys(validation).length) {

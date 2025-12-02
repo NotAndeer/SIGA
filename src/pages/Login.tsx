@@ -9,12 +9,15 @@ const featureList = [
   'Sesiones seguras respaldadas por Firebase Auth',
 ];
 
+type Credentials = { email: string; password: string };
+type FormErrors = Partial<Record<keyof Credentials | 'submit', string>>;
+
 const Login = () => {
-  const [credentials, setCredentials] = useState({
+  const [credentials, setCredentials] = useState<Credentials>({
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
 
   const { login, loading, error } = useAuth();
@@ -23,14 +26,16 @@ const Login = () => {
 
   const from = location.state?.from?.pathname || '/';
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, value } = e.target;
     setCredentials((prev) => ({
       ...prev,
       [name]: value,
     }));
 
-    if (errors[name]) {
+    if (errors[name as keyof Credentials]) {
       setErrors((prev) => ({
         ...prev,
         [name]: '',
@@ -39,7 +44,7 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
 
     if (!credentials.email.trim()) {
       newErrors.email = 'El email es obligatorio';
@@ -54,7 +59,7 @@ const Login = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formErrors = validateForm();

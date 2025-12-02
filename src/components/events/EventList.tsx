@@ -1,8 +1,15 @@
 import React from 'react';
+import { EventItem } from '../../types/models';
 import EventCard from './EventCard';
 import './EventList.css';
 
-const EventList = ({ events, onEdit, onDelete }) => {
+type EventListProps = {
+  events: EventItem[];
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+};
+
+const EventList: React.FC<EventListProps> = ({ events, onEdit, onDelete }) => {
   if (!events.length) {
     return <div className="event-empty">No hay eventos registrados.</div>;
   }
@@ -24,8 +31,9 @@ const EventList = ({ events, onEdit, onDelete }) => {
             {events.map((event) => {
               const eventDate = event.date ? new Date(event.date) : null;
               const formattedDate = eventDate && !Number.isNaN(eventDate) ? eventDate.toLocaleDateString('es-CO') : 'Sin fecha';
+              const eventId = event.id || event._id;
               return (
-                <tr key={event.id || event._id}>
+                <tr key={eventId}>
                   <td>{event.title}</td>
                   <td>{formattedDate}</td>
                   <td>{event.location || 'Pendiente'}</td>
@@ -35,8 +43,8 @@ const EventList = ({ events, onEdit, onDelete }) => {
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="table-btn" onClick={() => onEdit(event.id || event._id)}>Editar</button>
-                    <button className="table-btn danger" onClick={() => onDelete(event.id || event._id)}>Eliminar</button>
+                    <button className="table-btn" onClick={() => eventId && onEdit(eventId)}>Editar</button>
+                    <button className="table-btn danger" onClick={() => eventId && onDelete(eventId)}>Eliminar</button>
                   </td>
                 </tr>
               );

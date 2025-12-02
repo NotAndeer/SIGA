@@ -1,9 +1,17 @@
 import React from 'react';
+import { Member } from '../../types/models';
 import './MemberCard.css';
 
-const MemberCard = ({ member, onEdit, onDelete }) => {
+type MemberCardProps = {
+  member: Member;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+};
+
+const MemberCard: React.FC<MemberCardProps> = ({ member, onEdit, onDelete }) => {
   const joinDate = member.joinDate ? new Date(member.joinDate) : null;
   const formattedDate = joinDate && !Number.isNaN(joinDate) ? joinDate.toLocaleDateString('es-CO') : 'N/D';
+  const memberId = member.id || member._id;
 
   return (
     <div className="member-card">
@@ -16,8 +24,8 @@ const MemberCard = ({ member, onEdit, onDelete }) => {
       <div className="member-actions">
         <span className={`member-status ${member.status || 'active'}`}>{member.status || 'activo'}</span>
         <div className="member-action-buttons">
-          <button className="btn-light" onClick={() => onEdit(member.id || member._id)}>Editar</button>
-          <button className="btn-danger" onClick={() => onDelete(member.id || member._id)}>Eliminar</button>
+          <button className="btn-light" onClick={() => memberId && onEdit(memberId)}>Editar</button>
+          <button className="btn-danger" onClick={() => memberId && onDelete(memberId)}>Eliminar</button>
         </div>
       </div>
     </div>

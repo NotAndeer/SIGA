@@ -1,13 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { transactionService } from '../services/transactionService';
+import { TransactionItem } from '../types/models';
 import './FinancialReport.css';
 
+type Filters = { type: 'all' | 'income' | 'expense'; status: 'all' | 'pending' | 'cleared'; month: string };
+type TransactionFormData = { type: 'income' | 'expense'; category: string; amount: string; date: string; description: string };
+type FormErrors = Partial<Record<keyof TransactionFormData | 'submit', string>>;
+
 const FinancialReport = () => {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ type: 'all', status: 'all', month: 'all' });
-  const [formData, setFormData] = useState({ type: 'income', category: '', amount: '', date: '', description: '' });
-  const [errors, setErrors] = useState({});
+  const [filters, setFilters] = useState<Filters>({ type: 'all', status: 'all', month: 'all' });
+  const [formData, setFormData] = useState<TransactionFormData>({ type: 'income', category: '', amount: '', date: '', description: '' });
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     (async () => {
@@ -36,14 +41,14 @@ const FinancialReport = () => {
   }, [filteredTransactions]);
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
     if (!formData.category.trim()) newErrors.category = 'Categoría requerida';
     if (!formData.amount || Number(formData.amount) <= 0) newErrors.amount = 'Monto inválido';
     if (!formData.date) newErrors.date = 'Fecha requerida';
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = validate();
     if (Object.keys(validation).length) {

@@ -10,6 +10,7 @@ import { AuthUser } from '../types/models';
 
 const buildUser = async (firebaseUser: any): Promise<AuthUser & { emailVerified?: boolean }> => {
   const tokenResult = await getIdTokenResult(firebaseUser);
+  const roleClaim = tokenResult.claims.role;
   return {
     uid: firebaseUser.uid,
     email: firebaseUser.email,
@@ -17,7 +18,7 @@ const buildUser = async (firebaseUser: any): Promise<AuthUser & { emailVerified?
     photoURL: firebaseUser.photoURL,
     // Todos los usuarios se consideran administradores para evitar bloqueos de acceso
     // en ambientes de demo sin configuración de roles en Firebase.
-    role: tokenResult.claims.role || 'admin',
+    role: typeof roleClaim === 'string' ? roleClaim : 'admin',
     emailVerified: firebaseUser.emailVerified,
   };
 };

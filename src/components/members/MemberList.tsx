@@ -1,8 +1,15 @@
 import React from 'react';
+import { Member } from '../../types/models';
 import MemberCard from './MemberCard';
 import './MemberList.css';
 
-const MemberList = ({ members, onEdit, onDelete }) => {
+type MemberListProps = {
+  members: Member[];
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+};
+
+const MemberList: React.FC<MemberListProps> = ({ members, onEdit, onDelete }) => {
   if (!members.length) {
     return <div className="member-empty">No hay miembros registrados aún.</div>;
   }
@@ -25,8 +32,9 @@ const MemberList = ({ members, onEdit, onDelete }) => {
             {members.map((member) => {
               const joinDate = member.joinDate ? new Date(member.joinDate) : null;
               const formattedJoin = joinDate && !Number.isNaN(joinDate) ? joinDate.toLocaleDateString('es-CO') : 'N/D';
+              const memberId = member.id || member._id;
               return (
-                <tr key={member.id || member._id}>
+                <tr key={memberId}>
                   <td>
                     <div className="member-name-cell">{member.name}</div>
                     <div className="member-meta-text">{member.profession || 'Sin profesión'}</div>
@@ -40,10 +48,10 @@ const MemberList = ({ members, onEdit, onDelete }) => {
                   </td>
                   <td>{formattedJoin}</td>
                   <td className="actions">
-                    <button className="table-btn" onClick={() => onEdit(member.id || member._id)}>
+                    <button className="table-btn" onClick={() => memberId && onEdit(memberId)}>
                       Editar
                     </button>
-                    <button className="table-btn danger" onClick={() => onDelete(member.id || member._id)}>
+                    <button className="table-btn danger" onClick={() => memberId && onDelete(memberId)}>
                       Eliminar
                     </button>
                   </td>

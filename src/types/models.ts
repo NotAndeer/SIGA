@@ -1,5 +1,6 @@
 export interface Member {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   profession?: string;
@@ -7,10 +8,13 @@ export interface Member {
   status?: string;
   phone?: string;
   address?: string;
+  membershipType?: string;
+  paymentStatus?: string;
 }
 
 export interface EventItem {
   id: string;
+  _id?: string;
   title: string;
   date: string;
   location?: string;
@@ -18,6 +22,7 @@ export interface EventItem {
   capacity?: number;
   status?: string;
   category?: string;
+  createdAt?: string;
 }
 
 export interface TransactionItem {

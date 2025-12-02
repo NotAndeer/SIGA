@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useMember } from '../../context/MemberContext';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Member } from '../../types/models';
 import './MemberForm.css';
+
+type MemberFormData = Pick<Member, 'name' | 'email' | 'phone' | 'address' | 'profession' | 'membershipType' | 'joinDate' | 'status'>;
+type FormErrors = Partial<Record<keyof MemberFormData | 'submit', string>>;
 
 const MemberForm = () => {
   const { addMember, updateMember, getMemberById, currentMember } = useMember();
@@ -10,7 +14,7 @@ const MemberForm = () => {
 
   const isEditing = Boolean(id);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<MemberFormData>({
     name: '',
     email: '',
     phone: '',
@@ -21,7 +25,7 @@ const MemberForm = () => {
     status: 'active'
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -56,7 +60,9 @@ const MemberForm = () => {
     }
   }, [currentMember, isEditing]);
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -64,7 +70,7 @@ const MemberForm = () => {
     }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[name]) {
+    if (errors[name as keyof MemberFormData]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
@@ -73,7 +79,7 @@ const MemberForm = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'El nombre es obligatorio';
@@ -92,7 +98,7 @@ const MemberForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formErrors = validateForm();
