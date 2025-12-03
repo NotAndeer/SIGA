@@ -28,7 +28,7 @@ git clone https://github.com/tu-usuario/siga-frontend.git
 cd siga-frontend
 ```
 
-2. Instalar dependencias (para CI/Vercel usar la variante con `--legacy-peer-deps` que ya está configurada en `vercel.json`):
+2. Instalar dependencias (el repositorio incluye `.npmrc` con `legacy-peer-deps=true` y desactiva auditoría/fundraising para evitar bloqueos en CI/Vercel):
 ```bash
 npm install
 ```
