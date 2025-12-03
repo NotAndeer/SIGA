@@ -205,7 +205,7 @@ const EventForm = () => {
           <textarea
             id="description"
             name="description"
-            rows="4"
+            rows={4}
             value={formData.description}
             onChange={handleChange}
             placeholder="Agenda, objetivos y notas relevantes"
