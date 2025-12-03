@@ -3,15 +3,37 @@ import { transactionService } from '../services/transactionService';
 import { TransactionItem } from '../types/models';
 import './FinancialReport.css';
 
-type Filters = { type: 'all' | 'income' | 'expense'; status: 'all' | 'pending' | 'cleared'; month: string };
-type TransactionFormData = { type: 'income' | 'expense'; category: string; amount: string; date: string; description: string };
+type Filters = {
+  type: 'all' | 'income' | 'expense';
+  status: 'all' | 'pending' | 'cleared';
+  month: string;
+};
+
+type TransactionFormData = {
+  type: 'income' | 'expense';
+  category: string;
+  amount: string;
+  date: string;
+  description: string;
+};
+
 type FormErrors = Partial<Record<keyof TransactionFormData | 'submit', string>>;
 
 const FinancialReport = () => {
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({ type: 'all', status: 'all', month: 'all' });
-  const [formData, setFormData] = useState<TransactionFormData>({ type: 'income', category: '', amount: '', date: '', description: '' });
+  const [filters, setFilters] = useState<Filters>({
+    type: 'all',
+    status: 'all',
+    month: 'all',
+  });
+  const [formData, setFormData] = useState<TransactionFormData>({
+    type: 'income',
+    category: '',
+    amount: '',
+    date: '',
+    description: '',
+  });
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
@@ -29,28 +51,42 @@ const FinancialReport = () => {
     return transactions.filter((tx) => {
       const matchesType = filters.type === 'all' || tx.type === filters.type;
       const matchesStatus = filters.status === 'all' || tx.status === filters.status;
-      const matchesMonth = filters.month === 'all' || (tx.date && tx.date.startsWith(filters.month));
+      const matchesMonth =
+        filters.month === 'all' || (tx.date && tx.date.startsWith(filters.month));
       return matchesType && matchesStatus && matchesMonth;
     });
   }, [transactions, filters]);
 
   const totals = useMemo(() => {
-    const income = filteredTransactions.filter((t) => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-    const expenses = filteredTransactions.filter((t) => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-    return { income, expenses, balance: income - expenses };
+    const income = filteredTransactions
+      .filter((t) => t.type === 'income')
+      .reduce((acc, t) => acc + Number(t.amount || 0), 0);
+
+    const expenses = filteredTransactions
+      .filter((t) => t.type === 'expense')
+      .reduce((acc, t) => acc + Number(t.amount || 0), 0);
+
+    return {
+      income,
+      expenses,
+      balance: income - expenses,
+    };
   }, [filteredTransactions]);
 
   const validate = () => {
     const newErrors: FormErrors = {};
+
     if (!formData.category.trim()) newErrors.category = 'Categoría requerida';
     if (!formData.amount || Number(formData.amount) <= 0) newErrors.amount = 'Monto inválido';
     if (!formData.date) newErrors.date = 'Fecha requerida';
+
     return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validation = validate();
+
     if (Object.keys(validation).length) {
       setErrors(validation);
       return;
@@ -59,25 +95,37 @@ const FinancialReport = () => {
     const newTx = {
       ...formData,
       amount: Number(formData.amount),
-      status: 'pending'
+      status: 'pending' as const,
     };
 
     const saved = await transactionService.create(newTx);
     setTransactions((prev) => [saved.data, ...prev]);
-    setFormData({ type: 'income', category: '', amount: '', date: '', description: '' });
+    setFormData({
+      type: 'income',
+      category: '',
+      amount: '',
+      date: '',
+      description: '',
+    });
     setErrors({});
   };
 
-  const toggleStatus = async (id) => {
+  const toggleStatus = async (id: TransactionItem['id']) => {
     const target = transactions.find((tx) => tx.id === id);
-    const nextStatus = target?.status === 'cleared' ? 'pending' : 'cleared';
+    const nextStatus: TransactionItem['status'] =
+      target?.status === 'cleared' ? 'pending' : 'cleared';
+
     await transactionService.update(id, { status: nextStatus });
-    setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, status: nextStatus } : tx)));
+
+    setTransactions((prev) =>
+      prev.map((tx) => (tx.id === id ? { ...tx, status: nextStatus } : tx)),
+    );
   };
 
-  const deleteTx = async (id) => {
+  const deleteTx = async (id: TransactionItem['id']) => {
     const confirmed = window.confirm('¿Eliminar este movimiento?');
     if (!confirmed) return;
+
     await transactionService.delete(id);
     setTransactions((prev) => prev.filter((tx) => tx.id !== id));
   };
@@ -111,6 +159,7 @@ const FinancialReport = () => {
           <div className="panel-header">
             <h3>Registrar movimiento</h3>
           </div>
+
           <form className="finance-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
@@ -119,16 +168,34 @@ const FinancialReport = () => {
                   id="type"
                   name="type"
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as TransactionFormData['type'] })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      type: e.target.value as TransactionFormData['type'],
+                    })
+                  }
                 >
                   <option value="income">Ingreso</option>
                   <option value="expense">Egreso</option>
                 </select>
               </div>
+
               <div className="form-group">
                 <label htmlFor="category">Categoría *</label>
-                <input id="category" name="category" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} />
-                {errors.category && <span className="error-message">{errors.category}</span>}
+                <input
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      category: e.target.value,
+                    })
+                  }
+                />
+                {errors.category && (
+                  <span className="error-message">{errors.category}</span>
+                )}
               </div>
             </div>
 
@@ -140,15 +207,36 @@ const FinancialReport = () => {
                   id="amount"
                   name="amount"
                   value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      amount: e.target.value,
+                    })
+                  }
                   placeholder="0"
                 />
-                {errors.amount && <span className="error-message">{errors.amount}</span>}
+                {errors.amount && (
+                  <span className="error-message">{errors.amount}</span>
+                )}
               </div>
+
               <div className="form-group">
                 <label htmlFor="date">Fecha *</label>
-                <input type="date" id="date" name="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
-                {errors.date && <span className="error-message">{errors.date}</span>}
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      date: e.target.value,
+                    })
+                  }
+                />
+                {errors.date && (
+                  <span className="error-message">{errors.date}</span>
+                )}
               </div>
             </div>
 
@@ -159,12 +247,19 @@ const FinancialReport = () => {
                 name="description"
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    description: e.target.value,
+                  })
+                }
               />
             </div>
 
             <div className="form-actions">
-              <button type="submit" className="btn-primary">Agregar movimiento</button>
+              <button type="submit" className="btn-primary">
+                Agregar movimiento
+              </button>
             </div>
           </form>
         </div>
@@ -173,17 +268,43 @@ const FinancialReport = () => {
           <div className="panel-header">
             <h3>Movimientos</h3>
             <div className="filters">
-              <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
+              <select
+                value={filters.type}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    type: e.target.value as Filters['type'],
+                  })
+                }
+              >
                 <option value="all">Todos</option>
                 <option value="income">Ingresos</option>
                 <option value="expense">Egresos</option>
               </select>
-              <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
+
+              <select
+                value={filters.status}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    status: e.target.value as Filters['status'],
+                  })
+                }
+              >
                 <option value="all">Estado</option>
                 <option value="cleared">Conciliados</option>
                 <option value="pending">Pendientes</option>
               </select>
-              <select value={filters.month} onChange={(e) => setFilters({ ...filters, month: e.target.value })}>
+
+              <select
+                value={filters.month}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    month: e.target.value,
+                  })
+                }
+              >
                 <option value="all">Todos los meses</option>
                 <option value="2024-05">Mayo 2024</option>
                 <option value="2024-04">Abril 2024</option>
@@ -193,7 +314,13 @@ const FinancialReport = () => {
 
           <div className="transaction-list">
             {loading && <div className="empty">Cargando movimientos guardados…</div>}
-            {filteredTransactions.length === 0 && <div className="empty">No hay movimientos con los filtros seleccionados.</div>}
+
+            {!loading && filteredTransactions.length === 0 && (
+              <div className="empty">
+                No hay movimientos con los filtros seleccionados.
+              </div>
+            )}
+
             {filteredTransactions.map((tx) => (
               <div key={tx.id} className="transaction-item">
                 <div>
@@ -202,14 +329,30 @@ const FinancialReport = () => {
                   <p className="tx-date">{tx.date}</p>
                 </div>
                 <div className="tx-actions">
-                  <span className={`badge ${tx.type}`}>{tx.type === 'income' ? 'Ingreso' : 'Egreso'}</span>
-                  <span className={`badge ${tx.status}`}>{tx.status === 'cleared' ? 'Conciliado' : 'Pendiente'}</span>
-                  <p className={`tx-amount ${tx.type}`}>${Number(tx.amount).toLocaleString()}</p>
+                  <span className={`badge ${tx.type}`}>
+                    {tx.type === 'income' ? 'Ingreso' : 'Egreso'}
+                  </span>
+                  <span className={`badge ${tx.status}`}>
+                    {tx.status === 'cleared' ? 'Conciliado' : 'Pendiente'}
+                  </span>
+                  <p className={`tx-amount ${tx.type}`}>
+                    ${Number(tx.amount).toLocaleString()}
+                  </p>
                   <div className="action-buttons">
-                    <button className="btn-light" onClick={() => toggleStatus(tx.id)}>
-                      {tx.status === 'cleared' ? 'Marcar pendiente' : 'Conciliar'}
+                    <button
+                      className="btn-light"
+                      onClick={() => toggleStatus(tx.id)}
+                    >
+                      {tx.status === 'cleared'
+                        ? 'Marcar pendiente'
+                        : 'Conciliar'}
                     </button>
-                    <button className="btn-danger" onClick={() => deleteTx(tx.id)}>Eliminar</button>
+                    <button
+                      className="btn-danger"
+                      onClick={() => deleteTx(tx.id)}
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
