@@ -1,0 +1,80 @@
+.member-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.member-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.member-email {
+  margin: 0.2rem 0;
+  color: #475569;
+}
+
+.member-meta {
+  margin: 0.1rem 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.member-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.member-status {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.member-status.active {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.member-status.inactive,
+.member-status.suspended {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.member-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-light {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}

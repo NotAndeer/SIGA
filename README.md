@@ -12,6 +12,7 @@ SIGA es una aplicación web desarrollada en React.js para la gestión integral d
 - ✅ API REST integrada
 
 ## Tecnologías
+- TypeScript 4.9
 - React 18.2.0
 - React Router DOM 6.8.0
 - Axios 1.3.0
@@ -27,7 +28,7 @@ git clone https://github.com/tu-usuario/siga-frontend.git
 cd siga-frontend
 ```
 
-2. Instalar dependencias:
+2. Instalar dependencias (el repositorio incluye `.npmrc` con `legacy-peer-deps=true` y desactiva auditoría/fundraising para evitar bloqueos en CI/Vercel):
 ```bash
 npm install
 ```

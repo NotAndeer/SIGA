@@ -17,9 +17,35 @@
   height: 70px;
 }
 
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .logo-section .logo-link {
   text-decoration: none;
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-section h1 {
@@ -74,6 +100,16 @@
     flex-direction: column;
     height: auto;
     padding: 1rem;
+  }
+
+  .logo-section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
   }
 
   .main-nav .nav-list {
