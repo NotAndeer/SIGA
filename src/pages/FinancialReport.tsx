@@ -152,7 +152,7 @@ const FinancialReport = () => {
               <textarea
                 id="description"
                 name="description"
-                rows="3"
+                rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />

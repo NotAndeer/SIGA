@@ -208,7 +208,7 @@ const MemberForm = () => {
             name="address"
             value={formData.address}
             onChange={handleChange}
-            rows="3"
+            rows={3}
             placeholder="Ingresa la dirección completa"
           />
         </div>
