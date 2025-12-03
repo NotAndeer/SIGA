@@ -21,7 +21,6 @@
     "deploy:prod": "npm run build && scp -r build/* usuario@prod-server:/var/www/siga/"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
     "@types/node": "^20.17.9",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",
