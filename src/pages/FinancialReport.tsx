@@ -115,7 +115,12 @@ const FinancialReport = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="type">Tipo</label>
-                <select id="type" name="type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as TransactionFormData['type'] })}
+                >
                   <option value="income">Ingreso</option>
                   <option value="expense">Egreso</option>
                 </select>
