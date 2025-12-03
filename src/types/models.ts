@@ -20,7 +20,7 @@ export interface EventItem {
   location?: string;
   description?: string;
   capacity?: number;
-  status?: string;
+  status?: 'scheduled' | 'completed' | 'cancelled';
   category?: string;
   createdAt?: string;
 }

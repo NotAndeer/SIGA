@@ -16,6 +16,8 @@ type EventFormData = {
 
 type FormErrors = Partial<Record<keyof EventFormData | 'submit', string>>;
 
+const allowedStatuses: EventFormData['status'][] = ['scheduled', 'completed', 'cancelled'];
+
 const emptyEvent: EventFormData = {
   title: '',
   date: new Date().toISOString().split('T')[0],
@@ -53,13 +55,17 @@ const EventForm = () => {
 
   useEffect(() => {
     if (isEditing && currentEvent) {
+      const normalizedStatus = allowedStatuses.includes(currentEvent.status as EventFormData['status'])
+        ? (currentEvent.status as EventFormData['status'])
+        : 'scheduled';
+
       setFormData({
         title: currentEvent.title || '',
         date: currentEvent.date ? currentEvent.date.split('T')[0] : new Date().toISOString().split('T')[0],
         location: currentEvent.location || '',
         description: currentEvent.description || '',
         capacity: currentEvent.capacity ? String(currentEvent.capacity) : '',
-        status: currentEvent.status || 'scheduled',
+        status: normalizedStatus,
         category: currentEvent.category || 'general'
       });
     }
@@ -81,7 +87,7 @@ const EventForm = () => {
     if (errors[fieldName]) setErrors((prev) => ({ ...prev, [fieldName]: '' }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length) {
