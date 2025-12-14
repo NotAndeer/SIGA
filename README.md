@@ -1,5 +1,5 @@
 # SIGA - Sistema Integrado de Gestión para Asociaciones
-- Enlace funcional: siga-wheat.vercel.app/
+- Enlace funcional: https://siga-wheat.vercel.app/
 ## Descripción
 SIGA es una aplicación web desarrollada en React.js para la gestión integral de asociaciones, incluyendo módulos para miembros, eventos y finanzas.
 
