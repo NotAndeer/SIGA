@@ -9,61 +9,40 @@ const featureList = [
   'Sesiones seguras respaldadas por Firebase Auth',
 ];
 
-type Credentials = {
-  email: string;
-  password: string;
-};
-
-type FormErrors = Partial<Record<keyof Credentials, string>>;
-
-const Login: React.FC = () => {
-  const [credentials, setCredentials] = useState<Credentials>({
-    email: '',
-    password: '',
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
+const Login = () => {
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
   const { login, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/';
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setCredentials((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setCredentials((prev) => ({ ...prev, [name]: value }));
 
-    if ((errors as any)[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
-  const validateForm = (): FormErrors => {
-    const newErrors: FormErrors = {};
+  const validateForm = () => {
+    const newErrors = {};
 
-    if (!credentials.email.trim()) {
-      newErrors.email = 'El email es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
+    if (!credentials.email.trim()) newErrors.email = 'El email es obligatorio';
+    else if (!/\S+@\S+\.\S+/.test(credentials.email))
       newErrors.email = 'El formato del email es inválido';
-    }
 
-    if (!credentials.password) {
-      newErrors.password = 'La contraseña es obligatoria';
-    }
+    if (!credentials.password) newErrors.password = 'La contraseña es obligatoria';
 
     return newErrors;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formErrors = validateForm();
@@ -86,8 +65,7 @@ const Login: React.FC = () => {
         <p className="app-name">SIGA</p>
         <h1>Tu asociación conectada en un solo lugar</h1>
         <p className="subtitle">
-          Accede a un panel intuitivo para organizar miembros, eventos y finanzas con total
-          transparencia.
+          Accede a un panel intuitivo para organizar miembros, eventos y finanzas con total transparencia.
         </p>
 
         <div className="hero-features">
@@ -101,9 +79,7 @@ const Login: React.FC = () => {
         <div className="status-card">
           <div>
             <p className="status-title">Operación segura</p>
-            <p className="status-copy">
-              Autenticación cifrada con Firebase y sesiones renovables.
-            </p>
+            <p className="status-copy">Autenticación cifrada con Firebase y sesiones renovables.</p>
           </div>
           <span className="status-badge">En línea</span>
         </div>
@@ -121,10 +97,8 @@ const Login: React.FC = () => {
           </Link>
         </div>
 
-        {(location.state as any)?.registered && (
-          <div className="success-banner">
-            Cuenta creada correctamente. Ahora puedes iniciar sesión.
-          </div>
+        {location.state?.registered && (
+          <div className="success-banner">Cuenta creada correctamente. Ahora puedes iniciar sesión.</div>
         )}
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -171,9 +145,7 @@ const Login: React.FC = () => {
             {loading ? 'Ingresando...' : 'Entrar al panel'}
           </button>
 
-          <p className="helper">
-            ¿Problemas para ingresar? Contacta al administrador de tu asociación.
-          </p>
+          <p className="helper">¿Problemas para ingresar? Contacta al administrador de tu asociación.</p>
         </form>
       </section>
     </div>
