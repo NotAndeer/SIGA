@@ -1,49 +1,18 @@
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useEffect,
-  ReactNode,
-} from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { authService, authMapper } from '../services/authService';
 import { auth } from '../services/firebase';
 
-type AuthError = string | null;
+const AuthContext = createContext(null);
 
-type AuthState = {
-  isAuthenticated: boolean;
-  user: any | null; // Si tienes un tipo User, cámbialo aquí
-  loading: boolean;
-  error: AuthError;
-};
-
-type LoginCredentials = any; // Tipar según tu app
-type RegisterData = any; // Tipar según tu app
-
-type AuthAction =
-  | { type: 'LOGIN_START' }
-  | { type: 'LOGIN_SUCCESS'; payload: { user: any } }
-  | { type: 'LOGIN_FAILURE'; payload: string }
-  | { type: 'LOGOUT' }
-  | { type: 'SET_LOADING'; payload: boolean };
-
-type AuthContextValue = AuthState & {
-  login: (credentials: LoginCredentials) => Promise<any>;
-  logout: () => Promise<void>;
-  register: (data: RegisterData) => Promise<any>;
-};
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-const initialState: AuthState = {
+const initialState = {
   isAuthenticated: false,
   user: null,
   loading: false,
   error: null,
 };
 
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+const authReducer = (state, action) => {
   switch (action.type) {
     case 'LOGIN_START':
       return { ...state, loading: true, error: null };
@@ -82,7 +51,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   }
 };
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
@@ -110,17 +79,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => unsubscribe();
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = async (credentials) => {
     try {
       dispatch({ type: 'LOGIN_START' });
       const result = await authService.login(credentials);
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
       return result;
-    } catch (error: any) {
+    } catch (error) {
       const firebaseMessage =
         error?.code?.includes?.('auth/')
           ? 'Credenciales inválidas o usuario no encontrado'
           : 'Error de autenticación';
+
       dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
       throw error;
     }
@@ -131,23 +101,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'LOGOUT' });
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data) => {
     try {
       dispatch({ type: 'LOGIN_START' });
       const result = await authService.register(data);
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
       return result;
-    } catch (error: any) {
+    } catch (error) {
       const firebaseMessage =
         error?.code?.includes?.('auth/')
           ? 'No se pudo crear la cuenta con los datos proporcionados'
           : 'Error al crear la cuenta';
+
       dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
       throw error;
     }
   };
 
-  const value: AuthContextValue = {
+  const value = {
     ...state,
     login,
     logout,
@@ -157,7 +128,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextValue => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth debe ser usado dentro de AuthProvider');
