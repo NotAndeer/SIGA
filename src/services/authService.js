@@ -4,45 +4,27 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   getIdTokenResult,
-  User,
 } from 'firebase/auth';
 import { auth } from './firebase';
 
-export type AppUser = {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  role: string;
-  emailVerified: boolean;
-};
-
-type LoginCredentials = {
-  email: string;
-  password: string;
-};
-
-type RegisterData = {
-  name?: string;
-  email: string;
-  password: string;
-};
-
-const buildUser = async (firebaseUser: User): Promise<AppUser> => {
+// Construye el user de la app desde el user de Firebase
+const buildUser = async (firebaseUser) => {
   const tokenResult = await getIdTokenResult(firebaseUser);
+  const roleClaim = tokenResult?.claims?.role;
 
   return {
     uid: firebaseUser.uid,
     email: firebaseUser.email,
     displayName: firebaseUser.displayName,
     photoURL: firebaseUser.photoURL,
-    role: (tokenResult.claims as any)?.role || 'miembro',
+    // Si no hay roles configurados, por defecto admin para evitar bloqueos en demo
+    role: typeof roleClaim === 'string' ? roleClaim : 'admin',
     emailVerified: firebaseUser.emailVerified,
   };
 };
 
 export const authService = {
-  login: async ({ email, password }: LoginCredentials) => {
+  login: async ({ email, password }) => {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
     const parsedUser = await buildUser(user);
     return { user: parsedUser };
@@ -52,7 +34,7 @@ export const authService = {
     await signOut(auth);
   },
 
-  register: async ({ name, email, password }: RegisterData) => {
+  register: async ({ name, email, password }) => {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
 
     if (name) {
@@ -64,6 +46,4 @@ export const authService = {
   },
 };
 
-export const authMapper = {
-  buildUser,
-};
+export const authMapper = { buildUser };
