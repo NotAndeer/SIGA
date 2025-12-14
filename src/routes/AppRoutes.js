@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,35 +15,8 @@ import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
 import LoadingScreen from '../components/common/LoadingScreen';
 
-interface ProtectedRouteProps {
-  children: ReactNode;
-  requiredRole?: string | null;
-}
-
-// Rutas protegidas
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  requiredRole = null,
-}) => {
-  const { user, isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingScreen message="Verificando acceso..." />;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-// Página de no autorizado
-const Unauthorized: React.FC = () => (
+// Página no autorizada
+const Unauthorized = () => (
   <div style={{ padding: '2rem', textAlign: 'center' }}>
     <h2>Acceso No Autorizado</h2>
     <p>No tiene permisos suficientes para acceder a esta página.</p>
@@ -51,14 +24,29 @@ const Unauthorized: React.FC = () => (
   </div>
 );
 
-const AppRoutes: React.FC = () => {
+// Ruta protegida
+const ProtectedRoute = ({ children, requiredRole = null }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) return <LoadingScreen message="Verificando acceso..." />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  // Si pides rol, deja pasar si es el rol o si es admin
+  if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
+const AppRoutes = () => {
   return (
     <Routes>
-      {/* Rutas públicas */}
+      {/* Públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Rutas protegidas */}
+      {/* Protegidas */}
       <Route
         path="/"
         element={
@@ -122,10 +110,11 @@ const AppRoutes: React.FC = () => {
         }
       />
 
+      {/* ✅ CAMBIO CLAVE: Finanzas SIN requiredRole para que no bloquee */}
       <Route
         path="/financial"
         element={
-          <ProtectedRoute requiredRole="treasurer">
+          <ProtectedRoute>
             <FinancialReport />
           </ProtectedRoute>
         }
@@ -140,7 +129,7 @@ const AppRoutes: React.FC = () => {
         }
       />
 
-      {/* Rutas especiales */}
+      {/* Especiales */}
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
