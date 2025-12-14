@@ -3,41 +3,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Register.css';
 
-type RegisterForm = {
-  name: string;
-  email: string;
-  password: string;
-  passwordConfirm: string;
-};
-
-type RegisterErrors = Partial<Record<keyof RegisterForm | 'submit', string>>;
-
-const Register: React.FC = () => {
-  const [form, setForm] = useState<RegisterForm>({
+const Register = () => {
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
     passwordConfirm: '',
   });
 
-  const [errors, setErrors] = useState<RegisterErrors>({});
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { register } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
 
     setForm((prev) => ({ ...prev, [name]: value }));
 
-    if ((errors as any)[name]) {
+    if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
-  const validate = (): RegisterErrors => {
-    const err: RegisterErrors = {};
+  const validate = () => {
+    const err = {};
 
     if (!form.name.trim()) err.name = 'El nombre es obligatorio';
 
@@ -47,14 +38,12 @@ const Register: React.FC = () => {
     if (!form.password) err.password = 'La contraseña es obligatoria';
     else if (form.password.length < 8) err.password = 'La contraseña debe tener al menos 8 caracteres';
 
-    if (form.password !== form.passwordConfirm) {
-      err.passwordConfirm = 'Las contraseñas no coinciden';
-    }
+    if (form.password !== form.passwordConfirm) err.passwordConfirm = 'Las contraseñas no coinciden';
 
     return err;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validation = validate();
@@ -73,7 +62,7 @@ const Register: React.FC = () => {
       });
 
       navigate('/', { replace: true });
-    } catch (error: any) {
+    } catch (error) {
       const message = error?.message || 'Error al registrar el usuario';
       setErrors({ submit: message });
       console.error('Register error:', error);
