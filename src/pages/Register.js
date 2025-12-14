@@ -1,4 +1,3 @@
-// src/pages/Register.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -9,32 +8,44 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    passwordConfirm: ''
+    passwordConfirm: '',
   });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { register } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
   const validate = () => {
     const err = {};
+
     if (!form.name.trim()) err.name = 'El nombre es obligatorio';
+
     if (!form.email.trim()) err.email = 'El email es obligatorio';
     else if (!/\S+@\S+\.\S+/.test(form.email)) err.email = 'Formato de email inválido';
+
     if (!form.password) err.password = 'La contraseña es obligatoria';
-    if (form.password && form.password.length < 8) err.password = 'La contraseña debe tener al menos 8 caracteres';
+    else if (form.password.length < 8) err.password = 'La contraseña debe tener al menos 8 caracteres';
+
     if (form.password !== form.passwordConfirm) err.passwordConfirm = 'Las contraseñas no coinciden';
+
     return err;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const validation = validate();
     if (Object.keys(validation).length) {
       setErrors(validation);
@@ -43,6 +54,7 @@ const Register = () => {
 
     try {
       setLoading(true);
+
       await register({
         name: form.name,
         email: form.email,
@@ -51,7 +63,7 @@ const Register = () => {
 
       navigate('/', { replace: true });
     } catch (error) {
-      const message = error.message || 'Error al registrar el usuario';
+      const message = error?.message || 'Error al registrar el usuario';
       setErrors({ submit: message });
       console.error('Register error:', error);
     } finally {
@@ -77,6 +89,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.name ? 'error' : ''}
               placeholder="Tu nombre completo"
+              autoComplete="name"
             />
             {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
@@ -91,6 +104,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.email ? 'error' : ''}
               placeholder="usuario@ejemplo.com"
+              autoComplete="email"
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
@@ -105,6 +119,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.password ? 'error' : ''}
               placeholder="Mínimo 8 caracteres"
+              autoComplete="new-password"
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
@@ -119,24 +134,25 @@ const Register = () => {
               onChange={handleChange}
               className={errors.passwordConfirm ? 'error' : ''}
               placeholder="Repite la contraseña"
+              autoComplete="new-password"
             />
-            {errors.passwordConfirm && <span className="error-message">{errors.passwordConfirm}</span>}
+            {errors.passwordConfirm && (
+              <span className="error-message">{errors.passwordConfirm}</span>
+            )}
           </div>
 
           {errors.submit && <div className="form-error">{errors.submit}</div>}
 
           <div className="form-actions">
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Registrando...' : 'Crear cuenta'}
             </button>
 
             <p className="helper-text">
               ¿Ya tienes una cuenta?{' '}
-              <Link to="/login" className="link-inline">Inicia sesión</Link>
+              <Link to="/login" className="link-inline">
+                Inicia sesión
+              </Link>
             </p>
           </div>
         </form>

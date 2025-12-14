@@ -10,10 +10,7 @@ const featureList = [
 ];
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: '',
-  });
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
 
@@ -25,31 +22,22 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    setCredentials((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!credentials.email.trim()) {
-      newErrors.email = 'El email es obligatorio';
-    } else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
+    if (!credentials.email.trim()) newErrors.email = 'El email es obligatorio';
+    else if (!/\S+@\S+\.\S+/.test(credentials.email))
       newErrors.email = 'El formato del email es inválido';
-    }
 
-    if (!credentials.password) {
-      newErrors.password = 'La contraseña es obligatoria';
-    }
+    if (!credentials.password) newErrors.password = 'La contraseña es obligatoria';
 
     return newErrors;
   };
@@ -77,13 +65,14 @@ const Login = () => {
         <p className="app-name">SIGA</p>
         <h1>Tu asociación conectada en un solo lugar</h1>
         <p className="subtitle">
-          Accede a un panel intuitivo para organizar miembros, eventos y finanzas con total
-          transparencia.
+          Accede a un panel intuitivo para organizar miembros, eventos y finanzas con total transparencia.
         </p>
 
         <div className="hero-features">
           {featureList.map((feature) => (
-            <div key={feature} className="chip">{feature}</div>
+            <div key={feature} className="chip">
+              {feature}
+            </div>
           ))}
         </div>
 
@@ -103,7 +92,9 @@ const Login = () => {
             <h2>Inicia sesión</h2>
             <p className="description">Ingresa con las credenciales de tu asociación</p>
           </div>
-          <Link to="/register" className="ghost-button">Crear cuenta</Link>
+          <Link to="/register" className="ghost-button">
+            Crear cuenta
+          </Link>
         </div>
 
         {location.state?.registered && (
@@ -120,6 +111,7 @@ const Login = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 placeholder="usuario@asociacion.com"
+                autoComplete="email"
               />
             </div>
             {errors.email && <span className="hint error">{errors.email}</span>}
@@ -134,6 +126,7 @@ const Login = () => {
                 value={credentials.password}
                 onChange={handleChange}
                 placeholder="Ingresa tu contraseña"
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -152,9 +145,7 @@ const Login = () => {
             {loading ? 'Ingresando...' : 'Entrar al panel'}
           </button>
 
-          <p className="helper">
-            ¿Problemas para ingresar? Contacta al administrador de tu asociación.
-          </p>
+          <p className="helper">¿Problemas para ingresar? Contacta al administrador de tu asociación.</p>
         </form>
       </section>
     </div>

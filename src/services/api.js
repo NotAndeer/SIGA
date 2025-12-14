@@ -1,9 +1,10 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 
-// Configuración base de Axios
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+// Base URL
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,30 +14,27 @@ const api = axios.create({
   },
 });
 
-// Interceptor para añadir token de autenticación
+// Interceptor: agrega token Firebase
 api.interceptors.request.use(
-  async (config) => {
+  async (config: AxiosRequestConfig) => {
     const user = auth.currentUser;
-    if (user) {
+
+    if (user && config.headers) {
       const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor para manejar respuestas globalmente
+// Interceptor: manejo global de errores
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado o inválido - redirigir a login
-      signOut(auth);
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      await signOut(auth);
       window.location.href = '/login';
     }
     return Promise.reject(error);

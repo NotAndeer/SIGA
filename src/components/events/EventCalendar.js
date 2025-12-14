@@ -1,1 +1,0 @@
-export default function EventCalendar(){return <div>No hay eventos</div>;}

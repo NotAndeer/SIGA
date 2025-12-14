@@ -1,1 +1,0 @@
-export default function MemberStats({stats}){return <div>{JSON.stringify(stats)}</div>;} 

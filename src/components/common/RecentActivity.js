@@ -1,1 +1,0 @@
-export default function RecentActivity(){return <div>No hay actividad.</div>;}

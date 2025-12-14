@@ -3,7 +3,14 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { authService, authMapper } from '../services/authService';
 import { auth } from '../services/firebase';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
+
+const initialState = {
+  isAuthenticated: false,
+  user: null,
+  loading: false,
+  error: null,
+};
 
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -16,7 +23,7 @@ const authReducer = (state, action) => {
         loading: false,
         isAuthenticated: true,
         user: action.payload.user,
-        error: null
+        error: null,
       };
 
     case 'LOGIN_FAILURE':
@@ -25,7 +32,7 @@ const authReducer = (state, action) => {
         loading: false,
         isAuthenticated: false,
         user: null,
-        error: action.payload
+        error: action.payload,
       };
 
     case 'LOGOUT':
@@ -33,7 +40,7 @@ const authReducer = (state, action) => {
         ...state,
         isAuthenticated: false,
         user: null,
-        error: null
+        error: null,
       };
 
     case 'SET_LOADING':
@@ -42,13 +49,6 @@ const authReducer = (state, action) => {
     default:
       return state;
   }
-};
-
-const initialState = {
-  isAuthenticated: false,
-  user: null,
-  loading: false,
-  error: null
 };
 
 export const AuthProvider = ({ children }) => {
@@ -67,7 +67,10 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error al obtener el usuario de Firebase', error);
-        dispatch({ type: 'LOGIN_FAILURE', payload: 'No se pudo obtener la sesión' });
+        dispatch({
+          type: 'LOGIN_FAILURE',
+          payload: 'No se pudo obtener la sesión',
+        });
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
@@ -83,9 +86,11 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
       return result;
     } catch (error) {
-      const firebaseMessage = error.code?.includes('auth/')
-        ? 'Credenciales inválidas o usuario no encontrado'
-        : 'Error de autenticación';
+      const firebaseMessage =
+        error?.code?.includes?.('auth/')
+          ? 'Credenciales inválidas o usuario no encontrado'
+          : 'Error de autenticación';
+
       dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
       throw error;
     }
@@ -103,9 +108,11 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: 'LOGIN_SUCCESS', payload: { user: result.user } });
       return result;
     } catch (error) {
-      const firebaseMessage = error.code?.includes('auth/')
-        ? 'No se pudo crear la cuenta con los datos proporcionados'
-        : 'Error al crear la cuenta';
+      const firebaseMessage =
+        error?.code?.includes?.('auth/')
+          ? 'No se pudo crear la cuenta con los datos proporcionados'
+          : 'Error al crear la cuenta';
+
       dispatch({ type: 'LOGIN_FAILURE', payload: firebaseMessage });
       throw error;
     }
@@ -115,14 +122,10 @@ export const AuthProvider = ({ children }) => {
     ...state,
     login,
     logout,
-    register
+    register,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
