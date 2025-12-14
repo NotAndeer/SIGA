@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -15,28 +15,36 @@ const api = axios.create({
 
 // Interceptor para añadir token de autenticación
 api.interceptors.request.use(
-  async (config) => {
+  async (config: InternalAxiosRequestConfig) => {
     const user = auth.currentUser;
+
     if (user) {
       const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+
+      // Axios v1: config.headers puede ser AxiosHeaders, soporta .set()
+      if (config.headers && typeof (config.headers as any).set === 'function') {
+        (config.headers as any).set('Authorization', `Bearer ${token}`);
+      } else {
+        // Fallback: merge sin asignar {}
+        (config.headers as any) = {
+          ...(config.headers as any),
+          Authorization: `Bearer ${token}`,
+        };
+      }
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Interceptor para manejar respuestas globalmente
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado o inválido - redirigir a login
-      signOut(auth);
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      // Token expirado o inválido - cerrar sesión y redirigir
+      await signOut(auth);
       window.location.href = '/login';
     }
     return Promise.reject(error);
